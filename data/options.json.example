@@ -1,0 +1,13 @@
+{
+    "serverIp": "",
+    "databaseIp": "",
+    "databaseUsername": "",
+    "databasePasswd": "",  
+    "queryTimes": ,
+    "missionEndTimes": [
+
+    ],
+    "missionStartTimes": [
+
+    ]
+}
