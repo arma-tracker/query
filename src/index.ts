@@ -1,4 +1,5 @@
 import Gamedig from 'gamedig'
+import logger from 'skinwalker'
 import { readFileSync } from 'fs'
 
 interface Options {
@@ -8,7 +9,8 @@ interface Options {
     databasePasswd: string,
     queryTimes: number,
     missionEndTimes: string[],
-    missionStartTimes: string[]
+    missionStartTimes: string[],
+    logLevel: "TRACE" | "INFO" | "WARN" | "ERROR"
 }
 
 interface Player {
@@ -41,8 +43,16 @@ interface ServerResponse {
     ping: number
 }
 
+logger.init(getOptions().logLevel, {
+    traceWriteFile: true,
+    traceFileLocation: 'data/logs/',
+    infoFileLocation: 'data/logs/',
+    warnFileLocation: 'data/logs/',
+    errorFileLocation: 'data/logs/',
+})
+
 function getOptions(): Options {
-    return JSON.parse(readFileSync('data/options.json', { encoding: 'utf8', flag: 'r' }));
+    return JSON.parse(readFileSync('data/query-options.json', { encoding: 'utf8', flag: 'r' }));
 }
 
 function getServerData(){
