@@ -1,0 +1,11 @@
+{
+    "serverIp": "",
+    "databaseIp": "",
+    "databaseUsername": "",
+    "databasePasswd": "",
+    "cronTimezone": "",
+    "missionTimes": [
+
+    ]
+    "logLevel": ""
+}
