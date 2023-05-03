@@ -2,13 +2,10 @@
     "serverIp": "",
     "databaseIp": "",
     "databaseUsername": "",
-    "databasePasswd": "",  
-    "queryTimes": ,
-    "missionEndTimes": [
+    "databasePasswd": "",
+    "cronTimezone": "",
+    "missionTimes": [
 
-    ],
-    "missionStartTimes": [
-
-    ],
+    ]
     "logLevel": ""
 }
