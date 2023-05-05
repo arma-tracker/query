@@ -18,6 +18,7 @@ const serverStateSchema = new mongoose.Schema({
         steamid: String,
         tags: []
     },
+    date,
     maxplayers: Number,
     players: [],
     bots: [],
