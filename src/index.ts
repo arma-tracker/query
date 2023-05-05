@@ -38,6 +38,7 @@ interface ServerResponse {
         steamid: string,
         tags: string[]
     },
+    date,
     maxplayers: number,
     players: Player[],
     bots: Player[],
@@ -66,6 +67,7 @@ getOptions().missionTimes.forEach((time: string) => {
         getServerData().then(async (response: ServerResponse) => {
 
             logger.info(`Got server data`, `query`)
+            response.date = new Date().toISOString()
             logger.trace(`serverResponse: ${JSON.stringify(response)}`)
 
             const serverState = new ServerState(response)
@@ -117,6 +119,6 @@ function getServerData() {
         type: 'arma3',
         host: getOptions().serverIp
     })
-1
+
     return toReturn
 }
