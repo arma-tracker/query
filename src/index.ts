@@ -79,7 +79,7 @@ getOptions().missionTimes.forEach((time: string) => {
             })
 
         }).catch(err => {
-            logger.erro(`Encountered error quering server`, `query`)
+            logger.error(`Encountered error quering server`, `query`)
             logger.error(err.message, `query`)
         })
 
