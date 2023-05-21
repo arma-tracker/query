@@ -6,6 +6,15 @@
     "cronTimezone": "",
     "missionTimes": [
 
+    ],
+    groups: [
+        {
+            "groupName": "",
+            "groupMembers": [
+                "",
+                ""
+            ]
+        }
     ]
     "logLevel": ""
 }

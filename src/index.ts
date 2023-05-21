@@ -3,7 +3,13 @@ import logger from 'skinwalker'
 import nodeCron from 'node-cron'
 import mongoose from 'mongoose'
 import ServerState from '../models/serverState.js'
+import GroupModel from '../models/groupModel.js'
 import { readFileSync } from 'fs'
+
+interface Group {
+    groupName: string
+    groupMembers: string[]
+}
 
 interface Options {
     serverIp: string,
@@ -12,6 +18,7 @@ interface Options {
     databasePasswd: string,
     cronTimezone: string
     missionTimes: string[],
+    groups: Group[],
     logLevel: "TRACE" | "INFO" | "WARN" | "ERROR"
 }
 
@@ -42,6 +49,34 @@ interface ServerResponse {
     maxplayers: number,
     players: Player[],
     bots: Player[],
+    connect: string,
+    ping: number,
+    squad?: string
+}
+
+interface GroupObject {
+    name: string,
+    map: string,
+    squad: string,
+    password: boolean,
+    raw: {
+        protocol: number,
+        folder: string,
+        game: string,
+        appId: number,
+        numplayers: number,
+        numbots: number,
+        listentype: string,
+        environment: string,
+        secure: number,
+        version: string,
+        steamid: string,
+        tags: []
+    },
+    date: string,
+    maxplayers: number,
+    players: string[],
+    bots: [],
     connect: string,
     ping: number
 }
@@ -78,8 +113,48 @@ getOptions().missionTimes.forEach((time: string) => {
                 logger.error(err.message, `query`)
             })
 
+
+            getOptions().groups.forEach(async(group: Group) => {
+
+                logger.info(`Attempting to save ${group.groupName} attendance to database`,`query/${group.groupName}`)
+                var tempServerState = response
+                var tempPlayers: Player[] = [];
+                tempServerState.squad = group.groupName
+
+                var serverPlayers: string[] = []
+                response.players.forEach((player) => {
+                    serverPlayers.push(player.name)
+                })
+                logger.trace(`serverPlayers: ${serverPlayers}`, `query/${group.groupName}`)
+
+                group.groupMembers.forEach((groupMember: string) => {
+
+                    if (serverPlayers.includes(groupMember)){
+                        var tempPlayer: Player = {
+                            name: groupMember,
+                            raw: ';'
+                        }
+                        tempPlayers.push(tempPlayer)
+                    }
+                    
+                    logger.trace(`tempPlayers ${JSON.stringify(tempPlayers)}`, `query/${group.groupName}`)
+                    tempServerState.players = tempPlayers
+                                   
+                })
+
+                logger.trace(`tempServerState: ${JSON.stringify(tempServerState)}`, `query/${group.groupName}`) 
+                const groupModel = new GroupModel(tempServerState)
+                await groupModel.save().then(() => {
+                    logger.info(`${group.groupName} attendance successfully saved to database`, `query/${group.groupName}`)
+                }).catch(err => {
+                    logger.error(`Failed to save ${group.groupName} attendance to database`, `query/${group.groupName}`)
+                    logger.error(err.message, `query/${group.groupName}`)
+                })
+
+            })
+
         }).catch(err => {
-            logger.error(`Encountered error quering server`, `query`)
+            logger.error(`Encountered error quering server. Could the server be unreachable/offline?`, `query`)
             logger.error(err.message, `query`)
         })
 
