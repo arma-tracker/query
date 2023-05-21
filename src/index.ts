@@ -50,7 +50,8 @@ interface ServerResponse {
     players: Player[],
     bots: Player[],
     connect: string,
-    ping: number
+    ping: number,
+    squad?: string
 }
 
 interface GroupObject {
@@ -113,29 +114,41 @@ getOptions().missionTimes.forEach((time: string) => {
             })
 
 
-            getOptions().groups.forEach(async (group: Group) => {
+            getOptions().groups.forEach(async(group: Group) => {
 
-                logger.info(`Attempting to save ${group.groupName} attendance to database`,'query')  
-                var tempServerState: GroupObject;
-
-                Object.assign(tempServerState, response)
-                var players: string[] = [];
+                logger.info(`Attempting to save ${group.groupName} attendance to database`,`query/${group.groupName}`)
+                var tempServerState = response
+                var tempPlayers: Player[] = [];
                 tempServerState.squad = group.groupName
-                response.players.forEach((player) => {
-                    const strippedPlayer = player.name.replaceAll(/\s*\[.*?]/g,'').toUpperCase()
-                    if (strippedPlayer === player.name.toUpperCase()){
-                        players.push(player.name)
-                    }
-                })
-                tempServerState.players = players
-                logger.trace(`tempServerState: ${tempServerState}`, `query`)                
 
+                var serverPlayers: string[] = []
+                response.players.forEach((player) => {
+                    serverPlayers.push(player.name)
+                })
+                logger.trace(`serverPlayers: ${serverPlayers}`, `query/${group.groupName}`)
+
+                group.groupMembers.forEach((groupMember: string) => {
+
+                    if (serverPlayers.includes(groupMember)){
+                        var tempPlayer: Player = {
+                            name: groupMember,
+                            raw: ';'
+                        }
+                        tempPlayers.push(tempPlayer)
+                    }
+                    
+                    logger.trace(`tempPlayers ${JSON.stringify(tempPlayers)}`, `query/${group.groupName}`)
+                    tempServerState.players = tempPlayers
+                                   
+                })
+
+                logger.trace(`tempServerState: ${JSON.stringify(tempServerState)}`, `query/${group.groupName}`) 
                 const groupModel = new GroupModel(tempServerState)
                 await groupModel.save().then(() => {
-                    logger.info(`${group.groupName} attendance successfully saved to database`, `query`)
+                    logger.info(`${group.groupName} attendance successfully saved to database`, `query/${group.groupName}`)
                 }).catch(err => {
-                    logger.error(`Failed to save ${group.groupName} attendance to database`, `query`)
-                    logger.error(err.message, `query`)
+                    logger.error(`Failed to save ${group.groupName} attendance to database`, `query/${group.groupName}`)
+                    logger.error(err.message, `query/${group.groupName}`)
                 })
 
             })
