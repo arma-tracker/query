@@ -26,6 +26,6 @@
     "skinwalker": "^0.0.3"
   },
   "devDependencies": {
-    "@types/node": "^20.1.4"
+    "@types/node": "^20.3.2"
   }
 }
